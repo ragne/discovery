@@ -1,7 +1,14 @@
 use discovery::{DataCenterInfo, EurekaClient, Instance, LeaseInfo, PortData, Result, StatusType};
+use std::env;
+
+fn get_client() -> EurekaClient {
+    let host = env::var("EUREKA_HOST").unwrap_or("localhost".into());
+    dbg!(&host);
+    EurekaClient::new(format!("http://{}:8761/eureka/apps", host))
+}
 
 fn register_dummy() -> Result<()> {
-    let c = EurekaClient::new("http://localhost:8761/eureka/apps".to_owned());
+    let c = get_client();
     let inst = Instance {
         host_name: "127.0.0.1".into(),
         app: "myapp".into(),
@@ -35,7 +42,7 @@ fn integration_client_register() {
 
 #[test]
 fn integration_get_all() {
-    let c = EurekaClient::new("http://localhost:8761/eureka/apps".to_owned());
+    let c = get_client();
     register_dummy().unwrap();
     // app might not be available immediately
     let mut result = false;
@@ -57,7 +64,7 @@ fn integration_get_all() {
 fn integration_register_and_get() {
     register_dummy().unwrap();
 
-    let c = EurekaClient::new("http://localhost:8761/eureka/apps".to_owned());
+    let c = get_client();
     let mut result = false;
     for i in 0..10 {
         let res = c.get("MYAPP");

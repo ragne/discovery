@@ -11,6 +11,7 @@ jobs:
   dependencies:
     name: cargo build | dependencies
     runs-on: ubuntu-latest
+
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -62,6 +63,17 @@ jobs:
     name: cargo test
     needs: dependencies
     runs-on: ubuntu-latest
+
+    services:
+      # Label used to access the service container
+      eureka:
+        # Docker Hub image
+        image: ragne/eureka
+        #
+        ports:
+          # Opens tcp port 6379 on the host and service container
+          - 8761:8761
+
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -73,15 +85,8 @@ jobs:
           key: ci
 
       - uses: actions-rs/cargo@v1
+        env:
+          EUREKA_HOST: localhost
         with:
           command: test
           args: --all-features
-          
-      # Run all the examples
-      - name: example | associated
-        uses: actions-rs/cargo@v1
-        with:
-          command: run
-          args: --example associated
-
-

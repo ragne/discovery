@@ -96,6 +96,6 @@ impl EurekaClient {
         self.get_all()?
             .applications
             .remove(app_name)
-            .ok_or(EurekaError::NotFound(app_name.to_owned()))
+            .ok_or_else(|| EurekaError::NotFound(app_name.to_owned()))
     }
 }
